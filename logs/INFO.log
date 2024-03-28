@@ -1,0 +1,18 @@
+2024-03-28 14:43:24,188 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.16.1.94:5000
+2024-03-28 14:43:24,188 - INFO - [33mPress CTRL+C to quit[0m
+2024-03-28 14:43:24,189 - INFO -  * Restarting with stat
+2024-03-28 14:43:24,344 - WARNING -  * Debugger is active!
+2024-03-28 14:43:24,345 - INFO -  * Debugger PIN: 581-420-856
+2024-03-28 14:43:34,374 - INFO -  * Detected change in '/home/sakitha/projects/IEEE-R10-YP-GEMS/app/routes.py', reloading
+2024-03-28 14:43:34,414 - INFO -  * Restarting with stat
+2024-03-28 14:43:34,574 - WARNING -  * Debugger is active!
+2024-03-28 14:43:34,574 - INFO -  * Debugger PIN: 581-420-856
+2024-03-28 14:43:38,590 - INFO -  * Detected change in '/home/sakitha/projects/IEEE-R10-YP-GEMS/app/routes.py', reloading
+2024-03-28 14:43:38,623 - INFO -  * Restarting with stat
+2024-03-28 14:43:38,779 - WARNING -  * Debugger is active!
+2024-03-28 14:43:38,780 - INFO -  * Debugger PIN: 581-420-856
+2024-03-28 14:43:45,803 - INFO -  * Detected change in '/home/sakitha/projects/IEEE-R10-YP-GEMS/app/routes.py', reloading
+2024-03-28 14:43:45,830 - INFO -  * Restarting with stat
