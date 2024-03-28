@@ -7,14 +7,13 @@
     <link rel="stylesheet" href="../static/css/styles.css">
 </head>
 <body>
-    <form method="POST" action="/submit_invite">
+    <form id="invitation">
         <h2>Admin Invite Form</h2><br>
         <label for="Name">Name:</label>
         <input type="text" id="Name" Name="Name" required>
         
         <label for="Email">Email:</label>
-        <input type="email" id="Email" Name="Email" required
-        >
+        <input type="email" id="Email" Name="Email" required>
         
         <label for="TelephoneNumber">Telephone Number:</label>
         <input type="tel" id="TelephoneNumber" Name="TelephoneNumber" required>
@@ -31,8 +30,26 @@
         <label for="ValidTill">Valid Till:</label>
         <input type="date" id="ValidTill" Name="ValidTill">
         
-        <input type="submit" value="Submit">
+        <button type="submit">Submit</button>
     </form>
+        
+    <script>
+        document.getElementById('invitation').addEventListener('submit', function(event){
+            event.preventDefault();
+
+            const formData = new FormData(this);
+
+            fetch('/submit_invite',{
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data)
+            })
+        });
+
+    </script>
     
 </body>
 </html>

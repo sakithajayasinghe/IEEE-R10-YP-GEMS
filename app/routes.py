@@ -1,7 +1,8 @@
 from collections import namedtuple
 import configparser
 import secrets
-from flask import Flask, render_template,request
+import socket
+from flask import Flask, render_template,request, jsonify
 import logging
 import psycopg2
 
@@ -11,6 +12,8 @@ import psycopg2
 # logging.basicConfig(filename='logs/WARNING.log', level=logging.WARNING, format='%(asctime)s - %(levelname)s - %(message)s')
 # logging.basicConfig(filename='logs/ERROR.log', level=logging.ERROR, format='%(asctime)s - %(levelname)s - %(message)s')
 # logging.basicConfig(filename='logs/CRITICAL.log', level=logging.CRITICAL, format='%(asctime)s - %(levelname)s - %(message)s')
+PORT = 4242
+
 
 app = Flask(__name__)
 
@@ -46,6 +49,7 @@ def send_invitation():
                             validity=post_request_data['ValidTill'])
 
     unique_id = secrets.token_hex(12)
+    
 
     try:
 
@@ -63,11 +67,23 @@ def send_invitation():
     finally:
         cursor.close()
 
+    server_ip = get_server_ip()
+    url = (f'http://{server_ip}:{PORT}/signup/{unique_id}')
+    return jsonify({'unique_id': unique_id, 'signupURL':url}),200
 
-  
-  
-  
-    return 'status: COMPLETED'
+@app.route('/signup/<unique_id>', methods=['GET', 'POST'])
+def signup(unique_id):
+    credentials_status = check_credentials(connection=connection,unique_id=unique_id)
+    if credentials_status == False:
+        return 'not a valid user',404
+    
+
+    return render_template('password_reset.html')
+    
+
+
+        
+
 
 def connect_to_db(config):
     try:
@@ -94,7 +110,8 @@ def create_table(connection):
         organization_name VARCHAR(255),
         role_in_organization VARCHAR(50),
         validity DATE,
-        unique_id VARCHAR(50)
+        unique_id VARCHAR(50),
+        password VARCHAR(50)              
         );"""
                        ,
         """
@@ -106,10 +123,47 @@ def create_table(connection):
         print(f"Error creating table: {e}")
     finally:
         cursor.close()
+    
+
+def get_server_ip():
+    try:
+        # Create a socket object
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+        # Connect to a remote server
+        s.connect(("8.8.8.8", 80))
+
+        # Get the local IP address
+        ip_address = s.getsockname()[0]
+
+        # Close the socket
+        s.close()
+
+        return ip_address
+    except Exception as e:
+        print(f"Error: {e}")
+        return None
+
+def check_credentials(connection, unique_id):
+    try:
+        cursor = connection.cursor()
+        cursor.execute(f"SELECT email FROM invite_requests WHERE unique_id = '{unique_id}'")
+        row = cursor.fetchone()
+        
+        if not row:
+            return False
+        
+        return True
+    
+    except psycopg2.Error as e:
+        print(f"Error creating table: {e}")
+    finally:
+        cursor.close()
+
 
 if __name__ == "__main__":
     config = configparser.ConfigParser()
     config.read('../conf/config.ini')
     connection = connect_to_db(config=config)
     create_table(connection=connection)
-    app.run(debug=True, host='0.0.0.0')
+    app.run(debug=True, host='0.0.0.0', port=PORT)
