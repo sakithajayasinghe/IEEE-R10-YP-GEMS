@@ -1,11 +1,12 @@
 from collections import namedtuple
 import configparser
+import json
 import secrets
 import socket
 from flask import Flask, render_template,request, jsonify
 import logging
 import psycopg2
-
+import flask
 
 # logging.basicConfig(filename='logs/INFO.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 # logging.basicConfig(filename='logs/DEBUG.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -73,16 +74,64 @@ def send_invitation():
 
 @app.route('/signup/<unique_id>', methods=['GET', 'POST'])
 def signup(unique_id):
-    credentials_status = check_credentials(connection=connection,unique_id=unique_id)
-    if credentials_status == False:
+    credentials_status = check_credentials(connection=connection, placeholder1='email',\
+                                           placeholder2='unique_id', placeholder3= unique_id)
+    if not credentials_status[0]:
         return 'not a valid user',404
     
-
+    
     return render_template('password_reset.html')
     
 
-
+@app.route('/reset_password', methods=['POST'])
+def reset_password():
+    if request.method == 'POST':
+        password = request.form.get('password')
+        u_id = request.form.get('unique_id')
         
+        try:
+
+            cursor = connection.cursor()
+            cursor.execute(f"UPDATE invite_requests SET password = \
+                           '{password}' WHERE unique_id = '{u_id}'")
+            connection.commit()
+            
+        except psycopg2.Error as e:
+            print(f"Error creating table: {e}")
+        finally:
+            cursor.close()
+        
+    return '200 OK',200
+
+@app.route('/project-home', methods=['GET'])
+def login():
+    return render_template('login.html')
+    
+@app.route('/homepage', methods=['POST'])
+def homepage():
+    if request.method == 'POST':
+        user_email = request.form.get('useremail')
+        user_password = request.form.get('userpassword')
+        
+        # Check credentials against the database
+        credentials_status = check_credentials(connection=connection, placeholder1='password',
+                                                placeholder2='email', placeholder3=user_email)
+
+        if credentials_status[0] is not None and user_password == credentials_status[0]:
+            # Retrieve user details if credentials are correct
+            user_details = check_credentials(connection=connection,\
+                                            placeholder1='name,email,telephone_no,\
+                                                second_email,organization_name,\
+                                                role_in_organization,validity,unique_id',
+                                            placeholder2='email', placeholder3=user_email)
+
+            user_details_dict = details_to_dict(user_details=user_details)
+
+            return jsonify(user_details_dict)
+        else:
+            
+            return jsonify({'response': 'Invalid email or password'})
+
 
 
 def connect_to_db(config):
@@ -144,22 +193,34 @@ def get_server_ip():
         print(f"Error: {e}")
         return None
 
-def check_credentials(connection, unique_id):
+def check_credentials(connection, placeholder1, placeholder2, placeholder3):
     try:
         cursor = connection.cursor()
-        cursor.execute(f"SELECT email FROM invite_requests WHERE unique_id = '{unique_id}'")
+        cursor.execute(f"SELECT {placeholder1} FROM invite_requests WHERE \
+                       {placeholder2} = '{placeholder3}'")
         row = cursor.fetchone()
         
         if not row:
-            return False
+            return None
         
-        return True
+        return row
     
     except psycopg2.Error as e:
         print(f"Error creating table: {e}")
     finally:
         cursor.close()
 
+def details_to_dict(user_details):
+    return {
+        'name':user_details[0],
+        'email':user_details[1],
+        'telephone_no':user_details[2],
+        'second_email':user_details[3],
+        'organization_name':user_details[4],
+        'role_in_organization':user_details[5],
+        'validity':user_details[6],
+        'unique_id':user_details[7]
+    }
 
 if __name__ == "__main__":
     config = configparser.ConfigParser()

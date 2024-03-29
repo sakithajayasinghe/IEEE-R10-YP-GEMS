@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/css/styles.css">
+    <title>Document</title>
+</head>
+<body>
+
+    <form id="login-form">
+        <h2>***********Login**********</h2><br>
+        <h6>*check console log for user details API response*</h6><br>
+        <label id="email">*Enter Your Email and Password to Login</label><br>
+        <input type="email" id="useremail" name="useremail" placeholder="Enter your Email" required><br><br>
+        <input type="password" id="userpassword" name="userpassword" placeholder="Enter your password" required><br><br>
+        <button type="submit">Login</button>
+    </form>
+    <script>
+        document.getElementById('login-form').addEventListener('submit', function(event){
+            event.preventDefault();
+            const formData = new FormData(this);
+
+            fetch('/homepage',{
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data)
+            });
+        });
+    </script>
+</body>
+</html>

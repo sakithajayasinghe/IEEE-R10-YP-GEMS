@@ -30,6 +30,7 @@ h2 {
     font-size: 32px;
     color: #00ffcc; /* Neon green */
     border: #007bff;
+    padding: 5px;
     box-shadow: 0 0 10px #007bff;
     
 }
