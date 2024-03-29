@@ -7,6 +7,7 @@ from flask import Flask, render_template,request, jsonify
 import logging
 import psycopg2
 import flask
+from pydantic import BaseModel
 
 # logging.basicConfig(filename='logs/INFO.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 # logging.basicConfig(filename='logs/DEBUG.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -18,10 +19,17 @@ PORT = 4242
 
 app = Flask(__name__)
 
-InviteRequest = namedtuple(
-    'InviteRequest', ['name','email','telephone_no','second_email',\
-                      'organization_name','role_in_organization','validity']
-)
+
+
+class InviteRequest(BaseModel):
+    name: str
+    email: str
+    telephone_no: str
+    second_email: str = None
+    organization_name: str = None
+    role_in_organization: str = None
+    validity: str = None
+    unique_id: str = None
 
 @app.route('/')
 def index():
@@ -103,12 +111,12 @@ def reset_password():
         
     return '200 OK',200
 
-@app.route('/project-home', methods=['GET'])
+@app.route('/login', methods=['GET'])
 def login():
     return render_template('login.html')
     
-@app.route('/homepage', methods=['POST'])
-def homepage():
+@app.route('/login_validate', methods=['POST'])
+def login_validate():
     if request.method == 'POST':
         user_email = request.form.get('useremail')
         user_password = request.form.get('userpassword')
@@ -127,10 +135,39 @@ def homepage():
 
             user_details_dict = details_to_dict(user_details=user_details)
 
-            return jsonify(user_details_dict)
+            return jsonify(user_details_dict),200
         else:
             
-            return jsonify({'response': 'Invalid email or password'})
+            return jsonify({'response': 'Invalid email or password'}),404
+
+@app.route('/get_edited_user_details', methods=['POST'])
+def get_edited_user_details():
+    post_request_data = request.form
+
+    invitee_data = InviteRequest(
+        name=post_request_data['Name'],
+        email=post_request_data['Email'],
+        telephone_no=post_request_data['TelephoneNumber'],
+        second_email=post_request_data['SecondEmail'],
+        organization_name=post_request_data['OrgName'],
+        role_in_organization=post_request_data['Role'],
+        unique_id=post_request_data['UniqueId']
+    )
+    print(invitee_data)
+
+    cursor = connection.cursor()
+    cursor.execute("UPDATE invite_requests SET name = %s, email = %s, telephone_no = %s,\
+                    second_email = %s, organization_name = %s, role_in_organization = %s \
+                    WHERE unique_id = %s",
+                    (invitee_data.name, invitee_data.email, invitee_data.telephone_no,
+                    invitee_data.second_email, invitee_data.organization_name,
+                    invitee_data.role_in_organization, invitee_data.unique_id))
+
+    connection.commit()
+    cursor.close()
+
+    return jsonify({'status': 'COMPLETED'})
+
 
 
 
