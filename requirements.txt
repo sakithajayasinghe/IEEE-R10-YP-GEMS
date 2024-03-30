@@ -1,2 +1,4 @@
 Flask==3.0.2
 psycopg2-binary 
+Flask-Mail==0.9.1
+pydantic==2.6.4

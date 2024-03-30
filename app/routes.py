@@ -15,11 +15,7 @@ from pydantic import BaseModel
 # logging.basicConfig(filename='logs/ERROR.log', level=logging.ERROR, format='%(asctime)s - %(levelname)s - %(message)s')
 # logging.basicConfig(filename='logs/CRITICAL.log', level=logging.CRITICAL, format='%(asctime)s - %(levelname)s - %(message)s')
 PORT = 4242
-
-
 app = Flask(__name__)
-
-
 
 class InviteRequest(BaseModel):
     name: str
@@ -82,6 +78,7 @@ def send_invitation():
 
 @app.route('/signup/<unique_id>', methods=['GET', 'POST'])
 def signup(unique_id):
+
     credentials_status = check_credentials(connection=connection, placeholder1='email',\
                                            placeholder2='unique_id', placeholder3= unique_id)
     if not credentials_status[0]:
@@ -134,7 +131,8 @@ def login_validate():
                                             placeholder2='email', placeholder3=user_email)
 
             user_details_dict = details_to_dict(user_details=user_details)
-
+            app.secret_key = user_details_dict['unique_id']
+            flask.session['uniq_id'] = user_details_dict['unique_id']
             return jsonify(user_details_dict),200
         else:
             
@@ -153,7 +151,6 @@ def get_edited_user_details():
         role_in_organization=post_request_data['Role'],
         unique_id=post_request_data['UniqueId']
     )
-    print(invitee_data)
 
     cursor = connection.cursor()
     cursor.execute("UPDATE invite_requests SET name = %s, email = %s, telephone_no = %s,\
@@ -166,9 +163,13 @@ def get_edited_user_details():
     connection.commit()
     cursor.close()
 
-    return jsonify({'status': 'COMPLETED'})
+    return jsonify({'status': 'DATA UPDATED COMPLETED'})
 
-
+@app.route('/logout', methods=['GET'])
+def logout():
+    app.secret_key = flask.session['uniq_id']
+    del flask.session['uniq_id']
+    return jsonify({'status':'Logged Out'})
 
 
 def connect_to_db(config):
@@ -261,7 +262,7 @@ def details_to_dict(user_details):
 
 if __name__ == "__main__":
     config = configparser.ConfigParser()
-    config.read('../conf/config.ini')
+    config.read('conf/config.ini')
     connection = connect_to_db(config=config)
     create_table(connection=connection)
     app.run(debug=True, host='0.0.0.0', port=PORT)
