@@ -80,3 +80,17 @@ Operating system Ubuntu.Please use ubuntu os.
    ```
 
 8. **check logs folder for running url.**
+
+9. **check database details**
+   go inside the container
+   ```bash
+   docker exec -it postgres bash
+   psql -U postgres project
+   ```
+   type -> \dt
+   you can see the table
+   ![Alt text](image.png)
+
+   select * from invite_requests;
+
+
