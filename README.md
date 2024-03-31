@@ -99,6 +99,8 @@ Operating system Ubuntu.Please use ubuntu os.
 
    ![Alt text](image-1.png)
 
+   #### use signup url to add password to the account
+
    ![Alt text](image-2.png)
 
    ![Alt text](image-3.png)
@@ -109,6 +111,6 @@ Operating system Ubuntu.Please use ubuntu os.
 
    ![Alt text](image-6.png)
 
-   
+
 
 
