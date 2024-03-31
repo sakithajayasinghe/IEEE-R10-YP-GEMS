@@ -187,7 +187,6 @@ def connect_to_db(config):
 def create_table(connection):
     try:
         cursor = connection.cursor()
-        cursor.execute("CREATE DATABASE IF NOT EXISTS project;")
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS invite_requests (
         id SERIAL PRIMARY KEY,
