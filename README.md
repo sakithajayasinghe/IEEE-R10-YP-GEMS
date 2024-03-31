@@ -16,7 +16,7 @@ Operating system Ubuntu.Please use ubuntu os.
 1. **Clone the Repository:**
 
    ```bash
-   git clone https://github.com/<your-username>/<your-project-name>.git
+   git clone https://github.com/sakithajayasinghe/IEEE-R10-YP-GEMS.git
    code IEEE-R10-YP-GEMS (open project in vscode)
    ```
 
