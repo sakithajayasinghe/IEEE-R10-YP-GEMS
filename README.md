@@ -1,12 +1,6 @@
-project plan documents link
-clone project
-create venv
-install requirements
-install docker
-pull postgres
-start postgres container
-go to inside postgres container
-create database name called project
+## project plan design
+
+[https://drive.google.com/drive/folders/1hTTHVyi-rLBTHSJO6smHObB6cZ7134lN?usp=sharing]
 
 **Getting Started**
 
@@ -23,7 +17,7 @@ Operating system Ubuntu.Please use ubuntu os.
 
    ```bash
    git clone https://github.com/<your-username>/<your-project-name>.git
-   cd <your-project-name>
+   cd IEEE-R10-YP-GEMS
    ```
 
 2. **Create a Virtual Environment:**
@@ -78,6 +72,7 @@ Operating system Ubuntu.Please use ubuntu os.
    CREATE DATABASE project;
    ```
 
-
-**Additional Notes**
-
+3. **Run**
+   ```
+   python3 app/routes.py
+   ```
