@@ -56,9 +56,23 @@ Operating system Ubuntu.Please use ubuntu os.
    ```bash
    docker run -d --name postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 postgres:16
    ```
+3. **Go inside the postgres container**
+   ```bash
+   docker exec -it postgres bash
+   ```
+4. **Login postgres**
+   ```bash
+   psql -U postgres
+   
+   ```
+5. **Create postgres Database**
+   ```bash
+   CREATE DATABASE project;
+   
+   ```
 
 
-3. **Run**
+**Run**
    ```
    python3 app/routes.py
    ```
