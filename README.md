@@ -70,9 +70,13 @@ Operating system Ubuntu.Please use ubuntu os.
    CREATE DATABASE project;
    
    ```
+6. **exit from docker container**
 
+7. **come to the project terminal**
 
 **Run**
    ```
    python3 app/routes.py
    ```
+
+8. **check logs folder for running url.**
