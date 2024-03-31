@@ -21,7 +21,7 @@ Operating system Ubuntu.Please use ubuntu os.
    ```
 
 2. **Create a Virtual Environment:**
-
+   before create check venv in the project folder.
    It's highly recommended to create a virtual environment.
 
    - **Using `venv` :**
