@@ -40,7 +40,7 @@ def invite():
         if login_type == 'admin':
            return render_template('admin_invite.html')
         elif login_type == 'user':
-           return 'hi'
+           return render_template('login.html')
   
 
 @app.route('/submit_invite', methods=['POST'])
