@@ -1,5 +1,6 @@
 from collections import namedtuple
 import configparser
+from datetime import datetime
 import json
 import secrets
 import socket
@@ -9,11 +10,11 @@ import psycopg2
 import flask
 from pydantic import BaseModel
 
-# logging.basicConfig(filename='logs/INFO.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-# logging.basicConfig(filename='logs/DEBUG.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
-# logging.basicConfig(filename='logs/WARNING.log', level=logging.WARNING, format='%(asctime)s - %(levelname)s - %(message)s')
-# logging.basicConfig(filename='logs/ERROR.log', level=logging.ERROR, format='%(asctime)s - %(levelname)s - %(message)s')
-# logging.basicConfig(filename='logs/CRITICAL.log', level=logging.CRITICAL, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(filename='logs/INFO.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(filename='logs/DEBUG.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(filename='logs/WARNING.log', level=logging.WARNING, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(filename='logs/ERROR.log', level=logging.ERROR, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(filename='logs/CRITICAL.log', level=logging.CRITICAL, format='%(asctime)s - %(levelname)s - %(message)s')
 PORT = 4242
 app = Flask(__name__)
 
@@ -45,13 +46,16 @@ def invite():
 @app.route('/submit_invite', methods=['POST'])
 def send_invitation():
     post_request_data = request.form
-#   logging.debug(f'POST Request received {post_request_data}')
+    logging.debug(f'POST Request received {post_request_data}')
     invitee_data = InviteRequest(name=post_request_data['Name'],email=post_request_data['Email'],\
                             telephone_no=post_request_data['TelephoneNumber'],\
                             second_email=post_request_data['SecondEmail'],\
                             organization_name=post_request_data['OrgName'],\
                             role_in_organization=post_request_data['Role'],\
                             validity=post_request_data['ValidTill'])
+
+    validity = datetime.strptime(post_request_data['ValidTill'], '%Y-%m-%d')\
+          if post_request_data['ValidTill'] else None
 
     unique_id = secrets.token_hex(12)
     
@@ -64,11 +68,11 @@ def send_invitation():
                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", \
                         (invitee_data.name, invitee_data.email, invitee_data.telephone_no, \
                         invitee_data.second_email, invitee_data.organization_name, \
-                        invitee_data.role_in_organization, invitee_data.validity, unique_id))
+                        invitee_data.role_in_organization, validity, unique_id))
         connection.commit()
         
     except psycopg2.Error as e:
-        print(f"Error creating table: {e}")
+        logging.error(f"Error inserting data into database: {e}")
     finally:
         cursor.close()
 
@@ -81,7 +85,7 @@ def signup(unique_id):
 
     credentials_status = check_credentials(connection=connection, placeholder1='email',\
                                            placeholder2='unique_id', placeholder3= unique_id)
-    if not credentials_status[0]:
+    if not credentials_status:
         return 'not a valid user',404
     
     
@@ -118,12 +122,12 @@ def login_validate():
         user_email = request.form.get('useremail')
         user_password = request.form.get('userpassword')
         
-        # Check credentials against the database
+        
         credentials_status = check_credentials(connection=connection, placeholder1='password',
                                                 placeholder2='email', placeholder3=user_email)
 
         if credentials_status[0] is not None and user_password == credentials_status[0]:
-            # Retrieve user details if credentials are correct
+            
             user_details = check_credentials(connection=connection,\
                                             placeholder1='name,email,telephone_no,\
                                                 second_email,organization_name,\
@@ -131,8 +135,6 @@ def login_validate():
                                             placeholder2='email', placeholder3=user_email)
 
             user_details_dict = details_to_dict(user_details=user_details)
-            app.secret_key = user_details_dict['unique_id']
-            flask.session['uniq_id'] = user_details_dict['unique_id']
             return jsonify(user_details_dict),200
         else:
             
@@ -167,8 +169,6 @@ def get_edited_user_details():
 
 @app.route('/logout', methods=['GET'])
 def logout():
-    app.secret_key = flask.session['uniq_id']
-    del flask.session['uniq_id']
     return jsonify({'status':'Logged Out'})
 
 
@@ -187,6 +187,7 @@ def connect_to_db(config):
 def create_table(connection):
     try:
         cursor = connection.cursor()
+        cursor.execute("CREATE DATABASE IF NOT EXISTS project;")
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS invite_requests (
         id SERIAL PRIMARY KEY,
@@ -200,14 +201,16 @@ def create_table(connection):
         unique_id VARCHAR(50),
         password VARCHAR(50)              
         );"""
-                       ,
-        """
-        CREATE INDEX idx_unique_id ON invite_requests (unique_id);
-        """
         )
+
+        cursor.execute("""
+        CREATE INDEX IF NOT EXISTS idx_unique_id ON invite_requests (unique_id);
+        """)
+        logging.info('Table creation successful.')
+    
         connection.commit()
     except psycopg2.Error as e:
-        print(f"Error creating table: {e}")
+        logging.error(f"Error creating table: {e}")
     finally:
         cursor.close()
     
@@ -225,10 +228,10 @@ def get_server_ip():
 
         # Close the socket
         s.close()
-
+        logging.info(f"Local IP address: {ip_address}")
         return ip_address
     except Exception as e:
-        print(f"Error: {e}")
+        logging.error(f"Error: {e}") 
         return None
 
 def check_credentials(connection, placeholder1, placeholder2, placeholder3):
@@ -244,7 +247,7 @@ def check_credentials(connection, placeholder1, placeholder2, placeholder3):
         return row
     
     except psycopg2.Error as e:
-        print(f"Error creating table: {e}")
+        logging.error(f"Error executing SQL query: {e}")
     finally:
         cursor.close()
 
