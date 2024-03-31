@@ -27,7 +27,7 @@ Operating system Ubuntu.Please use ubuntu os.
    - **Using `venv` :**
 
      ```bash
-     python -m venv venv
+     python3 -m venv venv
      source venv/bin/activate  # Linux
      ```
 
@@ -48,7 +48,7 @@ Operating system Ubuntu.Please use ubuntu os.
 1. **Pull the Postgres Image:**
 
    ```bash
-   docker pull postgres
+   docker pull postgres:16
    ```
 
 2. **Start the Postgres Container:**
@@ -57,20 +57,6 @@ Operating system Ubuntu.Please use ubuntu os.
    docker run -d --name postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 postgres:16
    ```
 
-**Connect to Postgres Container (Optional)**
-
-1. **Enter the Container's Shell :**
-
-   ```bash
-   docker exec -it postgres bash
-   ```
-
-2. **Create a Database:**
-
-   ```sql
-   psql -U postgres
-   CREATE DATABASE project;
-   ```
 
 3. **Run**
    ```
