@@ -17,7 +17,7 @@ Operating system Ubuntu.Please use ubuntu os.
 
    ```bash
    git clone https://github.com/<your-username>/<your-project-name>.git
-   cd IEEE-R10-YP-GEMS
+   code IEEE-R10-YP-GEMS (open project in vscode)
    ```
 
 2. **Create a Virtual Environment:**
