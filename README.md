@@ -21,7 +21,7 @@ Operating system Ubuntu.Please use ubuntu os.
    ```
 
 2. **Create a Virtual Environment:**
-   before create check venv in the project folder.venv in project folder do not need to create venv.if you facing any issues from existing venv delete it and follow 2 & 3 steps.if not pass 2 & 3 steps.
+   before create venv, check venv in the project folder. if you facing any issues from existing venv delete it and follow 2 & 3 steps.if not pass 2 & 3 steps.
 
    - **Using `venv` :**
 
