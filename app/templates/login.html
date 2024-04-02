@@ -61,6 +61,11 @@
                 <h2>Edit Details</h2>
                 <p>* Check console log for Signup URL and unique id API response</p>
 
+                <label for="ProfilePicture">Profile Picture:</label>
+                <input type="file" id="ProfilePicture" name="ProfilePicture" accept="image/*"><br>
+                <img id="preview" src="#" alt="Profile Picture" style="display: none; max-width: 200px;"><br>
+
+
                 <div class="details-section">
                     <label for="UniqueId">Unique ID:</label>
                     <input type="text" id="UniqueId" name="UniqueId" readonly>
@@ -111,6 +116,23 @@
 
 
     <script>
+
+        document.getElementById('ProfilePicture').onchange = function(evt) {
+                    var tgt = evt.target || window.event.srcElement,
+                        files = tgt.files;
+
+                    
+                    if (FileReader && files && files.length) {
+                        var fr = new FileReader();
+                        fr.onload = function () {
+                            document.getElementById('preview').src = fr.result;
+                            document.getElementById('preview').style.display = 'block';
+                            document.getElementById('preview').style.borderRadius = '50%';
+                        }
+                        fr.readAsDataURL(files[0]);
+                    }
+                }
+
         document.getElementById('update-details-form').style.display = 'none';
         document.getElementById('logout-form').style.display = 'none';
         document.getElementById('login-form').addEventListener('submit', function(event){
