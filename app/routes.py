@@ -10,11 +10,9 @@ import psycopg2
 import flask
 from pydantic import BaseModel
 
-logging.basicConfig(filename='logs/INFO.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
 logging.basicConfig(filename='logs/DEBUG.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
-logging.basicConfig(filename='logs/WARNING.log', level=logging.WARNING, format='%(asctime)s - %(levelname)s - %(message)s')
-logging.basicConfig(filename='logs/ERROR.log', level=logging.ERROR, format='%(asctime)s - %(levelname)s - %(message)s')
-logging.basicConfig(filename='logs/CRITICAL.log', level=logging.CRITICAL, format='%(asctime)s - %(levelname)s - %(message)s')
+
 PORT = 4242
 app = Flask(__name__)
 
